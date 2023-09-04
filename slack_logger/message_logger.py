@@ -51,6 +51,10 @@ class SlackLogger:
         if self.default_level not in self.COLORS.keys():
             self.default_level = "default"
 
+        self.tag_channel = True
+        if kwargs.get("tag_channel") is False:
+            self.tag_channel = False
+
         self.slack = slack.WebClient(token=self.token)
 
     def _construct_heading_block(self):
@@ -116,13 +120,13 @@ class SlackLogger:
         return _block
 
     def send(
-        self,
-        channel,
-        title=None,
-        description=None,
-        level=None,
-        error=None,
-        metadata=None,
+            self,
+            channel,
+            title=None,
+            description=None,
+            level=None,
+            error=None,
+            metadata=None,
     ):
         if channel is None:
             raise ValueError("The field channel cannot be:", channel)
@@ -146,8 +150,9 @@ class SlackLogger:
         # The final list of all the blocks to be sent in the notification
         _blocks = list()
 
-        _heading_block = self._construct_heading_block()
-        _blocks.append(_heading_block)
+        if self.tag_channel:
+            _heading_block = self._construct_heading_block()
+            _blocks.append(_heading_block)
 
         _title_block = self._construct_title_block(_title, _level)
         _blocks.append(_title_block)
